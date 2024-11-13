@@ -1,0 +1,26 @@
+# Transiciones desde q0 (estado inicial)
+q0,a -> q1,X,R  # Si encuentra 'a', la marca con X y va a la derecha
+q0,b -> q1,Y,R  # Si encuentra 'b', la marca con Y y va a la derecha
+
+# Transiciones desde q1 (movimiento hacia la derecha)
+q1,a -> q1,a,R  # Sigue moviéndose a la derecha si encuentra 'a'
+q1,b -> q1,b,R  # Sigue moviéndose a la derecha si encuentra 'b'
+q1,_ -> q2,_,L  # Al encontrar espacio en blanco, retrocede para verificar
+q1,X -> qaccept,X,N  # Si encuentra X, significa que la cadena es palíndromo (caso base)
+q1,Y -> qaccept,Y,N  # Si encuentra Y, significa que la cadena es palíndromo (caso base)
+
+# Transiciones desde q2 (verificación y marcado del último carácter)
+q2,a[cache:a] -> q3,X,L  # Si el carácter coincide con el caché ('a'), marca con X
+q2,b[cache:b] -> q3,Y,L  # Si el carácter coincide con el caché ('b'), marca con Y
+q2,a[cache:b] -> qreject,a,N  # Si el carácter no coincide, rechaza
+q2,b[cache:a] -> qreject,b,N  # Si el carácter no coincide, rechaza
+
+# Transiciones desde q3 (regreso al inicio)
+q3,a -> q3,a,L  # Sigue moviéndose a la izquierda si encuentra 'a'
+q3,b -> q3,b,L  # Sigue moviéndose a la izquierda si encuentra 'b'
+q3,X -> q0,X,R  # Al encontrar X marcado, regresa al estado inicial
+q3,Y -> q0,Y,R  # Al encontrar Y marcado, regresa al estado inicial
+
+# Estados finales:
+# qaccept - La cadena es un palíndromo
+# qreject - La cadena no es un palíndromo
