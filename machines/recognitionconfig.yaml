@@ -1,26 +1,29 @@
 q_states:
   q_list:
-    - 'q0'    
-    - 'q1'    
-    - 'q2'    
-    - 'q3'   
+    - 'q0'    # Estado inicial
+    - 'q1'    # Mover derecha
+    - 'q2'    # Verificar último caracter
+    - 'q3'    # Regresar
     - 'qaccept'
     - 'qreject'
   initial: 'q0'
   final: 
     - 'qaccept'
     - 'qreject'
+
 alphabet:
   - 'a'
   - 'b'
+
 tape_alphabet:
   - 'a'
   - 'b'
   - '_'
   - 'X'
   - 'Y'
+
 delta:
-  # Estado q0: Inicio y marcado del primer carácter
+  # Estado inicial
   - params:
       initial_state: 'q0'
       mem_cache_value: null
@@ -30,6 +33,7 @@ delta:
       mem_cache_value: 'a'
       tape_output: 'X'
       tape_displacement: 'R'
+  
   - params:
       initial_state: 'q0'
       mem_cache_value: null
@@ -40,36 +44,69 @@ delta:
       tape_output: 'Y'
       tape_displacement: 'R'
   
-  # Estado q1: Moviéndose hacia la derecha
+  # Mover a la derecha (manteniendo el mem_cache)
   - params:
       initial_state: 'q1'
-      mem_cache_value: null
+      mem_cache_value: 'a'
       tape_input: 'a'
     output:
       final_state: 'q1'
-      mem_cache_value: null
+      mem_cache_value: 'a'
       tape_output: 'a'
       tape_displacement: 'R'
+  
   - params:
       initial_state: 'q1'
-      mem_cache_value: null
+      mem_cache_value: 'a'
       tape_input: 'b'
     output:
       final_state: 'q1'
-      mem_cache_value: null
+      mem_cache_value: 'a'
       tape_output: 'b'
       tape_displacement: 'R'
+  
   - params:
       initial_state: 'q1'
-      mem_cache_value: null
+      mem_cache_value: 'b'
+      tape_input: 'a'
+    output:
+      final_state: 'q1'
+      mem_cache_value: 'b'
+      tape_output: 'a'
+      tape_displacement: 'R'
+  
+  - params:
+      initial_state: 'q1'
+      mem_cache_value: 'b'
+      tape_input: 'b'
+    output:
+      final_state: 'q1'
+      mem_cache_value: 'b'
+      tape_output: 'b'
+      tape_displacement: 'R'
+  
+  # Encontrar el final de la cadena
+  - params:
+      initial_state: 'q1'
+      mem_cache_value: 'a'
       tape_input: '_'
     output:
       final_state: 'q2'
-      mem_cache_value: null
+      mem_cache_value: 'a'
       tape_output: '_'
       tape_displacement: 'L'
   
-  # Estado q2: Verificando último carácter y moviéndose hacia la izquierda
+  - params:
+      initial_state: 'q1'
+      mem_cache_value: 'b'
+      tape_input: '_'
+    output:
+      final_state: 'q2'
+      mem_cache_value: 'b'
+      tape_output: '_'
+      tape_displacement: 'L'
+
+  # Verificar último carácter
   - params:
       initial_state: 'q2'
       mem_cache_value: 'a'
@@ -79,6 +116,7 @@ delta:
       mem_cache_value: null
       tape_output: 'X'
       tape_displacement: 'L'
+  
   - params:
       initial_state: 'q2'
       mem_cache_value: 'b'
@@ -88,6 +126,8 @@ delta:
       mem_cache_value: null
       tape_output: 'Y'
       tape_displacement: 'L'
+  
+  # Transiciones de rechazo si no hay coincidencias
   - params:
       initial_state: 'q2'
       mem_cache_value: 'a'
@@ -97,6 +137,7 @@ delta:
       mem_cache_value: null
       tape_output: 'b'
       tape_displacement: 'N'
+  
   - params:
       initial_state: 'q2'
       mem_cache_value: 'b'
@@ -105,68 +146,73 @@ delta:
       final_state: 'qreject'
       mem_cache_value: null
       tape_output: 'a'
-      tape_displacement: 'N'
-  
-  # Estado q3: Regresando al inicio
-  - params:
-      initial_state: 'q3'
-      mem_cache_value: null
-      tape_input: 'a'
-    output:
-      final_state: 'q3'
-      mem_cache_value: null
-      tape_output: 'a'
-      tape_displacement: 'L'
-  - params:
-      initial_state: 'q3'
-      mem_cache_value: null
-      tape_input: 'b'
-    output:
-      final_state: 'q3'
-      mem_cache_value: null
-      tape_output: 'b'
-      tape_displacement: 'L'
-  - params:
-      initial_state: 'q3'
-      mem_cache_value: null
-      tape_input: 'X'
-    output:
-      final_state: 'q0'
-      mem_cache_value: null
-      tape_output: 'X'
-      tape_displacement: 'R'
-  - params:
-      initial_state: 'q3'
-      mem_cache_value: null
-      tape_input: 'Y'
-    output:
-      final_state: 'q0'
-      mem_cache_value: null
-      tape_output: 'Y'
-      tape_displacement: 'R'
-  
-  # Transiciones 
-  - params:
-      initial_state: 'q1'
-      mem_cache_value: null
-      tape_input: 'X'
-    output:
-      final_state: 'qaccept'
-      mem_cache_value: null
-      tape_output: 'X'
-      tape_displacement: 'N'
-  - params:
-      initial_state: 'q1'
-      mem_cache_value: null
-      tape_input: 'Y'
-    output:
-      final_state: 'qaccept'
-      mem_cache_value: null
-      tape_output: 'Y'
       tape_displacement: 'N'
 
+  # Regresar al inicio
+  - params:
+      initial_state: 'q3'
+      mem_cache_value: null
+      tape_input: 'a'
+    output:
+      final_state: 'q3'
+      mem_cache_value: null
+      tape_output: 'a'
+      tape_displacement: 'L'
+  
+  - params:
+      initial_state: 'q3'
+      mem_cache_value: null
+      tape_input: 'b'
+    output:
+      final_state: 'q3'
+      mem_cache_value: null
+      tape_output: 'b'
+      tape_displacement: 'L'
+  
+  # Volver a q0 al encontrar X/Y
+  - params:
+      initial_state: 'q3'
+      mem_cache_value: null
+      tape_input: 'X'
+    output:
+      final_state: 'q0'
+      mem_cache_value: null
+      tape_output: 'X'
+      tape_displacement: 'R'
+  
+  - params:
+      initial_state: 'q3'
+      mem_cache_value: null
+      tape_input: 'Y'
+    output:
+      final_state: 'q0'
+      mem_cache_value: null
+      tape_output: 'Y'
+      tape_displacement: 'R'
+
+  # Transiciones de aceptación
+  - params:
+      initial_state: 'q1'
+      mem_cache_value: null
+      tape_input: 'X'
+    output:
+      final_state: 'qaccept'
+      mem_cache_value: null
+      tape_output: 'X'
+      tape_displacement: 'R'
+  
+  - params:
+      initial_state: 'q1'
+      mem_cache_value: null
+      tape_input: 'Y'
+    output:
+      final_state: 'qaccept'
+      mem_cache_value: null
+      tape_output: 'Y'
+      tape_displacement: 'R'
+
 simulation_strings:
-  - 'abba'
-  - 'aabb'
-  - 'aba'
-  - 'abbaabba'
+  - 'ababa'
+  - 'aabbaa'
+  - 'aabab'
+  - 'abbbaab'
