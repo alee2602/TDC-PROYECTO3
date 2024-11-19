@@ -278,6 +278,6 @@ delta:
       tape_output: '1'
       tape_displacement: 'R'
 
-
 simulation_strings:
-  - '101'
+  - '00010111'
+  - '100101'

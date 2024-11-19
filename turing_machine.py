@@ -14,51 +14,58 @@ class TuringMachine:
         self.mem_cache = None
         self.current_state = 'q0'
 
+    def generate_instant_description(self):
+        while self.tape.head >= len(self.tape.tape):
+            self.tape.tape.append('_')
+
+        if self.tape.head < 0:
+            current_symbol = '_'
+            right_tape = ''.join(self.tape.tape)
+            left_tape = '' 
+        else:
+            current_symbol = self.tape.tape[self.tape.head]
+            right_tape = ''.join(self.tape.tape[self.tape.head + 1:])
+            left_tape = ''.join(self.tape.tape[:self.tape.head])
+        
+        cache_value = self.mem_cache if self.mem_cache is not None else 'null'
+        description = f"{left_tape}[{self.current_state}, {cache_value}]{current_symbol}{right_tape}"
+        return description
+
     def execute(self):
         steps = 0
         max_steps = 1000
-
-        print("\nStarting execution:")
-        print(f"Initial state: {self.current_state}")
-        print(f"Initial tape: {''.join(self.tape.tape[:20])}")
-        print(f"Initial head position: {self.tape.head}")
+        
+        print("\nEjecución de la máquina de Turing:")
+        initial_desc = self.generate_instant_description()
+        print(f"Descripción inicial:  ⊢ {initial_desc}")
         
         while self.current_state not in ['qaccept', 'qreject'] and steps < max_steps:
             symbol = self.tape.read()
-            print(f"\nStep {steps}:")
-            print(f"Current state: {self.current_state}")
-            print(f"Current symbol: {symbol}")
-            print(f"Memory cache: {self.mem_cache}")
-            
             transition = self.find_transition(symbol)
             
             if transition is None:
-                print(f"No transition found for state={self.current_state}, symbol={symbol}, mem_cache={self.mem_cache}")
+                print(f"No se encontró transición para el estado={self.current_state}, símbolo={symbol}, cache={self.mem_cache}")
                 self.current_state = 'qreject'
-                print("Input rejected")
+                final_desc = self.generate_instant_description()
+                print(f"Descripción final (rechazado): {final_desc}")
                 return False
             
-            print("Applying transition:")
-            print(f"  From state: {self.current_state}")
-            print(f"  To state: {transition['output']['final_state']}")
-            print(f"  Writing: {transition['output']['tape_output']}")
-            print(f"  Moving: {transition['output']['tape_displacement']}")
-            print(f"  New mem_cache: {transition['output']['mem_cache_value']}")
-            
             self.apply_transition(transition)
-            self.print_tape()
-            steps += 1
             
+            current_desc = self.generate_instant_description()
+            print(f" ⊢ {current_desc}")
+            steps += 1
+        
         success = self.current_state == 'qaccept'
-        print(f"\nFinal state: {self.current_state}")
-        print("Input", "accepted" if success else "rejected")
+        final_desc = self.generate_instant_description()
+        #print(f"\nDescripción final ({'aceptado' if success else 'rechazado'}): {final_desc}")
         return success
 
     def find_transition(self, symbol):
         for transition in self.delta:
             params = transition['params']
             if params['initial_state'] == self.current_state and params['tape_input'] == symbol:
-                if params['mem_cache_value'] is None or params['mem_cache_value'] == self.mem_cache: #Si no se especifíca un valor dentro de la caché
+                if params['mem_cache_value'] is None or params['mem_cache_value'] == self.mem_cache:
                     return transition
         return None
 
@@ -68,9 +75,3 @@ class TuringMachine:
         self.tape.write(transition['output']['tape_output'])
         if transition['output']['tape_displacement'] != 'N':
             self.tape.move(transition['output']['tape_displacement'])
-
-    def print_tape(self):
-        tape_content = "".join(self.tape.tape[:50])
-        head_position = " " * self.tape.head + "^"
-        print(f"Tape: {tape_content}")
-        print(f"Head: {head_position}")

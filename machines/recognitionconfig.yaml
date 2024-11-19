@@ -43,7 +43,7 @@ delta:
       mem_cache_value: 'b'
       tape_output: 'Y'
       tape_displacement: 'R'
-  
+
   # Mover a la derecha (manteniendo el mem_cache)
   - params:
       initial_state: 'q1'
