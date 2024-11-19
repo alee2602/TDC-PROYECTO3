@@ -1,0 +1,283 @@
+q_states:
+  q_list:
+    - 'q0'
+    - 'q1'
+    - 'q2'
+    - 'q3'
+    - 'q4'
+    - 'q5'
+    - 'q6'
+    - 'q7'
+    - 'q8'
+    - 'qaccept'
+  initial: 'q0'
+  final: 
+    - 'qaccept'
+
+alphabet:
+  - '0'
+  - '1'
+
+tape_alphabet:
+  - '0'
+  - '1'
+  - 'Z'
+  - 'B'
+  - 'A'
+  - '_'
+
+delta:
+  # Estado inicial
+  - params:
+      initial_state: 'q0'
+      mem_cache_value: null
+      tape_input: '0'
+    output:
+      final_state: 'q0'
+      mem_cache_value: null
+      tape_output: '0'
+      tape_displacement: 'L'
+
+  - params:
+      initial_state: 'q0'
+      mem_cache_value: null
+      tape_input: '1'
+    output:
+      final_state: 'q0'
+      mem_cache_value: null
+      tape_output: '1'
+      tape_displacement: 'L'
+
+  - params:
+      initial_state: 'q0'
+      mem_cache_value: null
+      tape_input: '_'
+    output:
+      final_state: 'q1'
+      mem_cache_value: null
+      tape_output: 'A'
+      tape_displacement: 'R'
+
+  - params:
+      initial_state: 'q1'
+      mem_cache_value: null
+      tape_input: '0'
+    output:
+      final_state: 'q1'
+      mem_cache_value: null
+      tape_output: '0'
+      tape_displacement: 'R'
+
+  - params:
+      initial_state: 'q1'
+      mem_cache_value: null
+      tape_input: '1'
+    output:
+      final_state: 'q1'
+      mem_cache_value: null
+      tape_output: '1'
+      tape_displacement: 'R'
+
+  - params:
+      initial_state: 'q1'
+      mem_cache_value: null
+      tape_input: '_'
+    output:
+      final_state: 'q2'
+      mem_cache_value: null
+      tape_output: 'Z'
+      tape_displacement: 'L'
+
+  - params:
+      initial_state: 'q2'
+      mem_cache_value: null
+      tape_input: '_'
+    output:
+      final_state: 'q2'
+      mem_cache_value: null
+      tape_output: '_'
+      tape_displacement: 'L'
+
+  - params:
+      initial_state: 'q2'
+      mem_cache_value: null
+      tape_input: 'A'
+    output:
+      final_state: 'q8'
+      mem_cache_value: null
+      tape_output: '_'
+      tape_displacement: 'L'
+
+  - params:
+      initial_state: 'q2'
+      mem_cache_value: null
+      tape_input: '1'
+    output:
+      final_state: 'q3'
+      mem_cache_value: null
+      tape_output: '_'
+      tape_displacement: 'R'
+
+  - params:
+      initial_state: 'q2'
+      mem_cache_value: null
+      tape_input: '0'
+    output:
+      final_state: 'q6'
+      mem_cache_value: null
+      tape_output: '_'
+      tape_displacement: 'R'
+
+  - params:
+      initial_state: 'q8'
+      mem_cache_value: null
+      tape_input: '_'
+    output:
+      final_state: 'q8'
+      mem_cache_value: null
+      tape_output: '_'
+      tape_displacement: 'R'
+
+  - params:
+      initial_state: 'q8'
+      mem_cache_value: null
+      tape_input: 'Z'
+    output:
+      final_state: 'qaccept'
+      mem_cache_value: null
+      tape_output: '_'
+      tape_displacement: 'R'
+
+  - params:
+      initial_state: 'q3'
+      mem_cache_value: null
+      tape_input: '_'
+    output:
+      final_state: 'q3'
+      mem_cache_value: null
+      tape_output: '_'
+      tape_displacement: 'R'
+
+  - params:
+      initial_state: 'q3'
+      mem_cache_value: null
+      tape_input: 'Z'
+    output:
+      final_state: 'q4'
+      mem_cache_value: null
+      tape_output: 'Z'
+      tape_displacement: 'R'
+
+  - params:
+      initial_state: 'q4'
+      mem_cache_value: null
+      tape_input: '_'
+    output:
+      final_state: 'q5'
+      mem_cache_value: null
+      tape_output: '1'
+      tape_displacement: 'L'
+
+  - params:
+      initial_state: 'q4'
+      mem_cache_value: null
+      tape_input: '0'
+    output:
+      final_state: 'q4'
+      mem_cache_value: null
+      tape_output: '0'
+      tape_displacement: 'R'
+
+  - params:
+      initial_state: 'q4'
+      mem_cache_value: null
+      tape_input: '1'
+    output:
+      final_state: 'q4'
+      mem_cache_value: null
+      tape_output: '1'
+      tape_displacement: 'R'
+
+  - params:
+      initial_state: 'q5'
+      mem_cache_value: null
+      tape_input: '0'
+    output:
+      final_state: 'q5'
+      mem_cache_value: null
+      tape_output: '0'
+      tape_displacement: 'L'
+
+  - params:
+      initial_state: 'q5'
+      mem_cache_value: null
+      tape_input: '1'
+    output:
+      final_state: 'q5'
+      mem_cache_value: null
+      tape_output: '1'
+      tape_displacement: 'L'
+
+  - params:
+      initial_state: 'q5'
+      mem_cache_value: null
+      tape_input: 'Z'
+    output:
+      final_state: 'q2'
+      mem_cache_value: null
+      tape_output: 'Z'
+      tape_displacement: 'L'
+
+  - params:
+      initial_state: 'q6'
+      mem_cache_value: null
+      tape_input: '_'
+    output:
+      final_state: 'q6'
+      mem_cache_value: null
+      tape_output: '_'
+      tape_displacement: 'R'
+
+  - params:
+      initial_state: 'q6'
+      mem_cache_value: null
+      tape_input: 'Z'
+    output:
+      final_state: 'q7'
+      mem_cache_value: null
+      tape_output: 'Z'
+      tape_displacement: 'R'
+
+  - params:
+      initial_state: 'q7'
+      mem_cache_value: null
+      tape_input: '_'
+    output:
+      final_state: 'q5'
+      mem_cache_value: null
+      tape_output: '0'
+      tape_displacement: 'L'
+
+  - params:
+      initial_state: 'q7'
+      mem_cache_value: null
+      tape_input: '0'
+    output:
+      final_state: 'q7'
+      mem_cache_value: null
+      tape_output: '0'
+      tape_displacement: 'R'
+
+  - params:
+      initial_state: 'q7'
+      mem_cache_value: null
+      tape_input: '1'
+    output:
+      final_state: 'q7'
+      mem_cache_value: null
+      tape_output: '1'
+      tape_displacement: 'R'
+
+
+simulation_strings:
+  - '101'
