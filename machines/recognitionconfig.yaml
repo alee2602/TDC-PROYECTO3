@@ -43,6 +43,27 @@ delta:
       mem_cache_value: 'b'
       tape_output: 'Y'
       tape_displacement: 'R'
+  
+  # Manejar X/Y en q0
+  - params:
+      initial_state: 'q0'
+      mem_cache_value: null
+      tape_input: 'X'
+    output:
+      final_state: 'q1'
+      mem_cache_value: null
+      tape_output: 'X'
+      tape_displacement: 'R'
+
+  - params:
+      initial_state: 'q0'
+      mem_cache_value: null
+      tape_input: 'Y'
+    output:
+      final_state: 'q1'
+      mem_cache_value: null
+      tape_output: 'Y'
+      tape_displacement: 'R'
 
   # Mover a la derecha (manteniendo el mem_cache)
   - params:
@@ -84,6 +105,47 @@ delta:
       mem_cache_value: 'b'
       tape_output: 'b'
       tape_displacement: 'R'
+
+  # Moverse sobre X/Y cuando hay algo en caché
+  - params:
+      initial_state: 'q1'
+      mem_cache_value: 'a'
+      tape_input: 'X'
+    output:
+      final_state: 'q1'
+      mem_cache_value: 'a'
+      tape_output: 'X'
+      tape_displacement: 'R'
+
+  - params:
+      initial_state: 'q1'
+      mem_cache_value: 'a'
+      tape_input: 'Y'
+    output:
+      final_state: 'q1'
+      mem_cache_value: 'a'
+      tape_output: 'Y'
+      tape_displacement: 'R'
+
+  - params:
+      initial_state: 'q1'
+      mem_cache_value: 'b'
+      tape_input: 'X'
+    output:
+      final_state: 'q1'
+      mem_cache_value: 'b'
+      tape_output: 'X'
+      tape_displacement: 'R'
+
+  - params:
+      initial_state: 'q1'
+      mem_cache_value: 'b'
+      tape_input: 'Y'
+    output:
+      final_state: 'q1'
+      mem_cache_value: 'b'
+      tape_output: 'Y'
+      tape_displacement: 'R'
   
   # Encontrar el final de la cadena
   - params:
@@ -104,6 +166,68 @@ delta:
       final_state: 'q2'
       mem_cache_value: 'b'
       tape_output: '_'
+      tape_displacement: 'L'
+
+  # Manejar blank en q2 (palíndromos de longitud impar)
+  - params:
+      initial_state: 'q2'
+      mem_cache_value: 'a'
+      tape_input: '_'
+    output:
+      final_state: 'qaccept'
+      mem_cache_value: null
+      tape_output: '_'
+      tape_displacement: 'N'
+
+  - params:
+      initial_state: 'q2'
+      mem_cache_value: 'b'
+      tape_input: '_'
+    output:
+      final_state: 'qaccept'
+      mem_cache_value: null
+      tape_output: '_'
+      tape_displacement: 'N'
+
+  # Ignorar X/Y en q2 cuando se busca el último carácter
+  - params:
+      initial_state: 'q2'
+      mem_cache_value: 'a'
+      tape_input: 'X'
+    output:
+      final_state: 'q2'
+      mem_cache_value: 'a'
+      tape_output: 'X'
+      tape_displacement: 'L'
+
+  - params:
+      initial_state: 'q2'
+      mem_cache_value: 'a'
+      tape_input: 'Y'
+    output:
+      final_state: 'q2'
+      mem_cache_value: 'a'
+      tape_output: 'Y'
+      tape_displacement: 'L'
+
+  - params:
+      initial_state: 'q2'
+      mem_cache_value: 'b'
+      tape_input: 'X'
+    output:
+      final_state: 'q2'
+      mem_cache_value: 'b'
+      tape_output: 'X'
+      tape_displacement: 'L'
+
+  - params:
+      initial_state: 'q2'
+      mem_cache_value: 'b'
+      tape_input: 'Y'
+    output:
+      final_state: 'q2'
+      mem_cache_value: 'b'
+      tape_output: 'Y'
       tape_displacement: 'L'
 
   # Verificar último carácter
@@ -136,7 +260,7 @@ delta:
       final_state: 'qreject'
       mem_cache_value: null
       tape_output: 'b'
-      tape_displacement: 'N'
+      tape_displacement: 'R'
   
   - params:
       initial_state: 'q2'
@@ -146,7 +270,7 @@ delta:
       final_state: 'qreject'
       mem_cache_value: null
       tape_output: 'a'
-      tape_displacement: 'N'
+      tape_displacement: 'R'
 
   # Regresar al inicio
   - params:
@@ -190,7 +314,7 @@ delta:
       tape_output: 'Y'
       tape_displacement: 'R'
 
-  # Transiciones de aceptación
+  # Aceptar solo cuando no hay caché y encontramos X/Y
   - params:
       initial_state: 'q1'
       mem_cache_value: null
