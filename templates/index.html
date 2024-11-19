@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulador Máquina de Turing</title>
+    <link href="https://unpkg.com/tailwindcss@^1.0/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+        }
+        .scrollable {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center">
+    <div class="flex flex-col gap-2 bg-white shadow-md rounded-lg p-6 w-full max-w-3xl">
+        <h1 class="text-3xl font-bold text-center text-gray-800 mb-6">Simulador de Máquina de Turing</h1>
+        
+        <!-- Selección de máquina -->
+        <div class="mb-4">
+            <label for="machineSelector" class="block text-gray-700 font-medium mb-2">Selecciona una máquina:</label>
+            <select id="machineSelector" class="block w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <option value="" disabled selected>Cargando máquinas...</option>
+            </select>
+            <button id="loadMachineButton" 
+                class="bg-blue-500 text-white px-4 py-2 rounded mt-2 hover:bg-blue-600">
+                Cargar Máquina
+            </button>
+        </div>
+        <hr class="my-4">
+        <h1 class="text-xl">Ingresa una cadena de entrada:</h1>
+        <div class="grid grid-cols-2 gap-8">
+            <!-- Strings de simulación -->
+            <div class="mb-4">
+                <label for="stringSelector" class="block text-gray-700 font-medium mb-2">Selecciona un string:</label>
+                <select id="stringSelector" class="block w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500" disabled>
+                    <option value="" disabled selected>Selecciona un string</option>
+                </select>
+                <button id="simulateFromSelectButton" 
+                    class="bg-green-500 text-white px-4 py-2 rounded mt-2 hover:bg-green-600" 
+                    disabled>
+                    Iniciar Simulación (String)
+                </button>
+            </div>
+            <!-- Entrada manual -->
+            <div class="mb-4">
+                <label for="inputString" class="block text-gray-700 font-medium mb-2">Cadena inicial (entrada manual):</label>
+                <input 
+                    type="text" 
+                    id="inputString" 
+                    placeholder="Ingrese la cinta inicial" 
+                    class="block w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+                <button id="simulateFromManualButton" 
+                    class="bg-purple-500 text-white px-4 py-2 rounded mt-2 hover:bg-purple-600">
+                    Iniciar Simulación (Manual)
+                </button>
+            </div>
+        </div>
+        
+
+        <!-- Resultados de la simulación -->
+        <div id="simulation" class="mt-6 p-4 bg-gray-50 rounded shadow-inner scrollable">
+            <p class="text-gray-500 text-center">Aquí se mostrarán los pasos de la simulación.</p>
+        </div>
+    </div>
+
+    <script>
+        // Función para cargar las máquinas disponibles
+        async function loadMachines() {
+            try {
+                const response = await fetch('/machines');
+                if (!response.ok) throw new Error("Error al obtener máquinas.");
+
+                const data = await response.json();
+                const selector = document.getElementById("machineSelector");
+                selector.innerHTML = '<option value="" disabled selected>Selecciona una máquina</option>';
+
+                data.machines.forEach(machine => {
+                    const option = document.createElement("option");
+                    option.value = machine.id;
+                    option.textContent = machine.name;
+                    selector.appendChild(option);
+                });
+            } catch (error) {
+                alert(`Error al cargar máquinas: ${error.message}`);
+            }
+        }
+
+        // Función para cargar los strings de simulación
+        async function loadStrings() {
+            const machineId = document.getElementById("machineSelector").value;
+            if (!machineId) {
+                alert("Seleccione una máquina primero.");
+                return;
+            }
+
+            try {
+                const response = await fetch(`/get_machine_strings/${machineId}`);
+                if (!response.ok) throw new Error("Error al obtener strings de simulación.");
+
+                const data = await response.json();
+                const selector = document.getElementById("stringSelector");
+                selector.innerHTML = '<option value="" disabled selected>Selecciona un string</option>';
+
+                data.strings.forEach(string => {
+                    const option = document.createElement("option");
+                    option.value = string;
+                    option.textContent = string;
+                    selector.appendChild(option);
+                });
+
+                selector.disabled = false;
+                document.getElementById("simulateFromSelectButton").disabled = false;
+            } catch (error) {
+                alert(`Error al cargar strings: ${error.message}`);
+            }
+        }
+
+        // Función para iniciar simulación desde un string seleccionado
+        async function simulateFromSelect() {
+            const machineId = document.getElementById("machineSelector").value;
+            const string = document.getElementById("stringSelector").value;
+
+            if (!string) {
+                alert("Seleccione un string para simular.");
+                return;
+            }
+
+            await startSimulation(machineId, string);
+        }
+
+        // Función para iniciar simulación desde entrada manual
+        async function simulateFromManual() {
+            const machineId = document.getElementById("machineSelector").value;
+            const inputString = document.getElementById("inputString").value.trim();
+
+            if (!inputString) {
+                alert("Ingrese un string para simular.");
+                return;
+            }
+
+            await startSimulation(machineId, inputString);
+        }
+
+        // Función para realizar la simulación
+        async function startSimulation(machineId, inputString) {
+            try {
+                const response = await fetch('/simulate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ machine_id: machineId, input_string: inputString })
+                });
+
+                const data = await response.json();
+                const simulationDiv = document.getElementById("simulation");
+                simulationDiv.innerHTML = "";
+
+                if (data.error) {
+                    simulationDiv.textContent = data.error;
+                    return;
+                }
+
+                data.steps.forEach(step => {
+                    simulationDiv.innerHTML += `
+                        <div class="p-2 border-b">
+                            ⊢<span class="text-green-700">${step.left_tape}</span>
+                            <strong>[${step.current_state}, ${step.cache_value}]</strong> 
+                            <span class="text-red-700">${step.current_symbol}</span>${step.right_tape}
+                        </div>
+                    `;
+                });
+
+                simulationDiv.innerHTML += `<h2 class="text-lg font-bold mt-4 text-center">Resultado: ${data.result}</h2>`;
+            } catch (error) {
+                alert(`Error en la simulación: ${error.message}`);
+            }
+        }
+
+        // Listeners para los botones
+        document.getElementById("loadMachineButton").addEventListener("click", loadStrings);
+        document.getElementById("simulateFromSelectButton").addEventListener("click", simulateFromSelect);
+        document.getElementById("simulateFromManualButton").addEventListener("click", simulateFromManual);
+
+        // Cargar máquinas al iniciar
+        loadMachines();
+    </script>
+</body>
+</html>

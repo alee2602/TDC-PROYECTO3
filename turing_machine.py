@@ -10,6 +10,8 @@ class TuringMachine:
         self.mem_cache = None
 
     def load_tape(self, input_string):
+        if not isinstance(input_string, str):
+            raise ValueError("La cinta inicial debe ser una cadena.")
         self.tape = Tape(input_string)
         self.mem_cache = None
         self.current_state = 'q0'
@@ -26,40 +28,42 @@ class TuringMachine:
             current_symbol = self.tape.tape[self.tape.head]
             right_tape = ''.join(self.tape.tape[self.tape.head + 1:])
             left_tape = ''.join(self.tape.tape[:self.tape.head])
-        
-        cache_value = self.mem_cache if self.mem_cache is not None else 'null'
-        description = f"{left_tape}[{self.current_state}, {cache_value}]{current_symbol}{right_tape}"
-        return description
 
-    def execute(self):
-        steps = 0
-        max_steps = 1000
-        
-        print("\nEjecución de la máquina de Turing:")
-        initial_desc = self.generate_instant_description()
-        print(f"Descripción inicial:  ⊢ {initial_desc}")
-        
-        while self.current_state not in ['qaccept', 'qreject'] and steps < max_steps:
-            symbol = self.tape.read()
-            transition = self.find_transition(symbol)
-            
-            if transition is None:
-                print(f"No se encontró transición para el estado={self.current_state}, símbolo={symbol}, cache={self.mem_cache}")
-                self.current_state = 'qreject'
-                final_desc = self.generate_instant_description()
-                print(f"Descripción final (rechazado): {final_desc}")
-                return False
-            
+        cache_value = self.mem_cache if self.mem_cache is not None else 'null'
+        return {
+            "left_tape": left_tape,
+            "current_state": self.current_state,
+            "cache_value": cache_value,
+            "current_symbol": current_symbol,
+            "right_tape": right_tape
+        }
+
+
+    def execute_step(self):
+        if self.current_state in ['qaccept', 'qreject']:
+            return {
+                "description": self.generate_instant_description(),
+                "result": "accepted" if self.current_state == "qaccept" else "rejected"
+            }
+
+        symbol = self.tape.read()
+        transition = self.find_transition(symbol)
+
+        if transition:
             self.apply_transition(transition)
-            
-            current_desc = self.generate_instant_description()
-            print(f" ⊢ {current_desc}")
-            steps += 1
-        
-        success = self.current_state == 'qaccept'
-        final_desc = self.generate_instant_description()
-        #print(f"\nDescripción final ({'aceptado' if success else 'rechazado'}): {final_desc}")
-        return success
+            # Siempre devolver el estado actual después de aplicar la transición
+            return {
+                "description": self.generate_instant_description()
+            }
+        else:
+            self.current_state = 'qreject'
+            # Siempre devuelve un diccionario, incluso si no se encuentra transición
+            return {
+                "description": self.generate_instant_description(),
+                "result": "rejected"
+            }
+
+
 
     def find_transition(self, symbol):
         for transition in self.delta:
