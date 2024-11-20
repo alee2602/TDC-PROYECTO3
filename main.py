@@ -40,6 +40,8 @@ def simulate():
     tm = TuringMachine(config)
 
     tm.load_tape(input_string)
+    initial_desc = "⊢["+tm.current_state + ", null]" + input_string
+    initial_desc = {"starting_state":tm.current_state, "cache": None, "string":input_string}
 
     steps = []
     while tm.current_state not in ['qaccept', 'qreject']:
@@ -50,8 +52,9 @@ def simulate():
     # Agregar el último paso para incluir el estado final
     steps.append(tm.execute_step()["description"])
 
+
     result = "aceptada" if tm.current_state == 'qaccept' else "rechazada"
-    return jsonify({"steps": steps, "result": result})
+    return jsonify({"initial_desc": initial_desc, "steps": steps, "result": result})
 
 
 @app.route('/simulate_step', methods=['POST'])
