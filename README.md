@@ -189,7 +189,7 @@ Cuando la simulación termine, observarás si la cadena fue aceptada o rechazada
 
 Dentro de la carpeta del proyecto, ejecuta el siguiente comando:
 ```bash
-pyhon main.py
+python main.py
 ```
 El proyecto se ejecutará en el local host: [http://127.0.0.1:5000/](http://127.0.0.1:5000/)
 
