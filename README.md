@@ -192,10 +192,11 @@ Dentro de la carpeta del proyecto, ejecuta el siguiente comando:
 python main.py
 ```
 El proyecto se ejecutará en el local host: [http://127.0.0.1:5000/](http://127.0.0.1:5000/)
-
 --- 
 
 ## 📺 Ver Video de Demostración
 
 Pueder ver el video de demostración a continuación:
+
+[Video Proyecto 3](https://youtu.be/oQGwts5-hjE)
 
