@@ -9,7 +9,6 @@ q_states:
   initial: 'q0'
   final: 
     - 'qaccept'
-    - 'qreject'
 
 alphabet:
   - 'a'

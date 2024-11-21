@@ -13,10 +13,14 @@
             max-height: 300px;
             overflow-y: auto;
         }
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
     </style>
 </head>
 <body class="bg-gray-100 min-h-screen flex flex-col items-center justify-center">
-    <h1 class="text-3xl font-bold text-center text-gray-800 mb-6">Simulador de Máquina de Turing</h1>
+    <h1 class="text-3xl font-bold text-center text-gray-800 mb-6 pt-16">Simulador de Máquina de Turing</h1>
     <section class="grid grid-cols-1 md:grid-cols-2 gap-4 bg-white shadow-md rounded-lg p-6 w-full max-w-4xl h-screen">
         <!-- Selección de máquina -->
         <div class="grid grid-rows-4 gap-2">
@@ -51,11 +55,12 @@
                     <input 
                         type="text" 
                         id="inputString" 
-                        placeholder="Ingrese la cinta inicial" 
+                        placeholder="Ingrese una cadena" 
                         class="block w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                     <button id="simulateFromManualButton" 
-                        class="bg-purple-500 text-white px-4 py-2 rounded mt-2 hover:bg-purple-600">
+                        class="bg-purple-500 text-white px-4 py-2 rounded mt-2 hover:bg-purple-600"
+                        disabled>
                         Iniciar Simulación (Manual)
                     </button>
                 </div>
@@ -117,6 +122,8 @@
 
                 selector.disabled = false;
                 document.getElementById("simulateFromSelectButton").disabled = false;
+                document.getElementById("inputString").disabled = false;
+                document.getElementById("simulateFromManualButton").disabled = false;
             } catch (error) {
                 alert(`Error al cargar strings: ${error.message}`);
             }
