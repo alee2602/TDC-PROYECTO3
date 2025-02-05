@@ -9,7 +9,8 @@ app = Flask(__name__)
 # Configuraciones disponibles
 machine_configs = {
     "recognition": load_yaml('machines/recognitionconfig.yaml'),
-    "altering": load_yaml('machines/alteringconfig.yaml')
+    "altering": load_yaml('machines/alteringconfig.yaml'),
+    "fibo": load_yaml('machines/fiboconfig.yaml')
 }
 
 @app.route('/')
@@ -21,8 +22,9 @@ def get_machines():
     """Devuelve las opciones disponibles de máquinas."""
     return jsonify({
         "machines": [
+            {"id": "fibo", "name": "Máquina de Fibonacci"},
             {"id": "recognition", "name": "Máquina de Reconocimiento (Palíndromos)"},
-            {"id": "altering", "name": "Máquina de Transformación (Invertir y Complementar)"}
+            {"id": "altering", "name": "Máquina de Transformación (Invertir y Complementar)"},
         ]
     })
 
@@ -38,6 +40,7 @@ def simulate():
 
     config = machine_configs[machine_id]
     tm = TuringMachine(config)
+    print(tm)
 
     tm.load_tape(input_string)
     initial_desc = "⊢["+tm.current_state + ", null]" + input_string

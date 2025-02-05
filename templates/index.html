@@ -195,6 +195,8 @@
                 });
 
                 simulationDiv.innerHTML += `<h2 class="text-lg font-bold mt-4 text-center">Resultado: ${data.result}</h2>`;
+                tape_result = data.steps[data.steps.length - 1].left_tape + data.steps[data.steps.length - 1].current_symbol + data.steps[data.steps.length - 1].right_tape
+                simulationDiv.innerHTML += `<h2 class="text-lg font-bold mt-4 text-center">Cinta final: ${tape_result}</h2>`;
             } catch (error) {
                 alert(`Error en la simulación: ${error.message}`);
             }

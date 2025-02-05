@@ -1,0 +1,142 @@
+q_states:
+  q_list:
+    - 'q0'
+    - 'q_search_0000'
+    - 'q_res_0000'
+    - 'q_search_0001'
+    - 'q_res_0001'
+    - 'q_non_base_case'
+    - 'qaccept'
+  initial: 'q0'
+  final: 
+    - 'qaccept'
+
+alphabet:
+  - '0'
+  - '1'
+  - '#'
+  - '_'
+
+tape_alphabet:
+  - '0'
+  - '1'
+  - '#'
+  - '_'
+
+delta:
+# Verificar casos base:
+# Se busca por una cadena 0000 o 0001 con cualquier cantidad de 0's a la izquierda
+
+# El primer caso a verificar es el de 0000
+  - params:
+      initial_state: 'q0'
+      mem_cache_value: null
+      tape_input: '0'
+    output:
+      final_state: 'q_search_0000'
+      mem_cache_value: null
+      tape_output: '0'
+      tape_displacement: 'R'
+# Verifica un nuevo 0 a la derecha
+  - params:
+      initial_state: 'q_search_0000'
+      mem_cache_value: null
+      tape_input: '0'
+    output:
+      final_state: 'q_search_0000'
+      mem_cache_value: null
+      tape_output: '0'
+      tape_displacement: 'R'
+
+# Si encuentra un 1 entra al estado de búsqueda del estado de 0001
+  - params:
+      initial_state: 'q_search_0000'
+      mem_cache_value: null
+      tape_input: '1'
+    output:
+      final_state: 'q_search_0001'
+      mem_cache_value: null
+      tape_output: '1'
+      tape_displacement: 'R'
+
+# Si ya no hay más caracteres a la derecha, se cumple el caso de 0000, entra en el estado de q_is0
+  - params:
+      initial_state: 'q_search_0000'
+      mem_cache_value: null
+      tape_input: '_'
+    output:
+      final_state: 'q_is_0000'
+      mem_cache_value: null
+      tape_output: '#'
+      tape_displacement: 'R'
+
+# Búsqueda del caso 0001
+
+  - params:
+      initial_state: 'q0'
+      mem_cache_value: null
+      tape_input: '1'
+    output:
+      final_state: 'q_search_0001'
+      mem_cache_value: null
+      tape_output: '1'
+      tape_displacement: 'R'
+
+  - params:
+      initial_state: 'q_search_0001'
+      mem_cache_value: null
+      tape_input: '_'
+    output:
+      final_state: 'q_is_0001'
+      mem_cache_value: null
+      tape_output: '#'
+      tape_displacement: 'R'
+
+  - params:
+      initial_state: 'q_search_0001'
+      mem_cache_value: null
+      tape_input: '0'
+    output:
+      final_state: 'q_non_base_case'
+      mem_cache_value: null
+      tape_output: '0'
+      tape_displacement: 'R'
+    
+  - params:
+      initial_state: 'q_search_0001'
+      mem_cache_value: null
+      tape_input: '1'
+    output:
+      final_state: 'q_non_base_case'
+      mem_cache_value: null
+      tape_output: '1'
+      tape_displacement: 'R'
+
+# Respuesta 0000
+  - params:
+      initial_state: 'q_is_0000'
+      mem_cache_value: null
+      tape_input: '_'
+    output:
+      final_state: 'qaccept'
+      mem_cache_value: null
+      tape_output: '0000'
+      tape_displacement: 'L'
+
+# Respuesta 0001
+  - params:
+      initial_state: 'q_is_0001'
+      mem_cache_value: null
+      tape_input: '_'
+    output:
+      final_state: 'qaccept'
+      mem_cache_value: null
+      tape_output: '0001'
+      tape_displacement: 'L'
+
+
+simulation_strings:
+  - '0000'
+  - '01'
+  - '0001'
+  - '0010'
