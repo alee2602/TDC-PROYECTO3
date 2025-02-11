@@ -10,7 +10,8 @@ app = Flask(__name__)
 machine_configs = {
     "recognition": load_yaml('machines/recognitionconfig.yaml'),
     "altering": load_yaml('machines/alteringconfig.yaml'),
-    "fibo": load_yaml('machines/fiboconfig.yaml')
+    "fibo": load_yaml('machines/fiboconfig.yaml'),
+    "binary": load_yaml('machines/binaryconfig.yaml'),
 }
 
 @app.route('/')
@@ -22,6 +23,7 @@ def get_machines():
     """Devuelve las opciones disponibles de máquinas."""
     return jsonify({
         "machines": [
+            {"id": "binary", "name": "Máquina de Suma Binaria"},
             {"id": "fibo", "name": "Máquina de Fibonacci"},
             {"id": "recognition", "name": "Máquina de Reconocimiento (Palíndromos)"},
             {"id": "altering", "name": "Máquina de Transformación (Invertir y Complementar)"},

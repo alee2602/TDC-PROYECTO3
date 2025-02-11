@@ -1,0 +1,724 @@
+q_states:
+  q_list:
+    - 'q0'
+    - 'q_firstSum_IdentifyFirst'
+    - 'q_firstSum_SearchSecond'         # Busca un #
+    - 'q_firstSum_VerifyEndingRight'    # Busca un _ justo después del #, si lo encuentra se pasa a un estado de aceptación (por ahora), si no, se pasa a un estado de búsqueda de _ para pasar de estado (Y se mueve a la derecha)
+    - 'q_firstSum_IdentifySecond'       # Se mueve a la izquierda ignorando los _, cuando se encuentra un 1 o 0 hace el cálculo con la memoria y se mueve a la izquierda
+    - 'q_normalSum_SearchFirst'         # Busca un #
+    - 'q_normalSum_IdentifyFirst'       # Hacia la izquierda, ignora las B's, suma y guarda en memoria si encuentra un 1, 0 o _ (Se mueve a la derecha)
+    - 'q_normalSum_SearchSecond'        # Busca un #
+    - 'q_normalSum_VerifyEndingRight'   # Busca un _ justo después del #, si lo encuentra se pasa a un estado de aceptación (por ahora), si no, se pasa a un estado de búsqueda de _ para pasar de estado (Y se mueve a la derecha)
+    - 'q_normalSum_IdentifySecond'      # Se mueve a la izquierda ignorando los _, cuando se encuentra un 1 o 0 hace el cálculo con la memoria y se mueve a la izquierda
+    - 'q_verifyFirst'
+    - 'qaccept'
+  initial: 'q0'
+  final:
+    - 'qaccept'
+
+alphabet:
+  - '0'
+  - '1'
+  - '#'
+  - '_'
+
+tape_alphabet:
+  - '0'
+  - '1'
+  - '#'
+  - 'B'
+  - 'Z'
+  - 'O'
+  - '_'
+
+delta:
+  - params:
+      initial_state: 'q0'
+      mem_cache_value: null
+      tape_input: '#'
+    output:
+      final_state: 'q_firstSum_IdentifyFirst'
+      mem_cache_value: null
+      tape_output: '#'
+      tape_displacement: 'L'
+
+  - params:
+      initial_state: 'q0'
+      mem_cache_value: null
+      tape_input: '0'
+    output:
+      final_state: 'q0'
+      mem_cache_value: null
+      tape_output: '0'
+      tape_displacement: 'R'
+
+  - params:
+      initial_state: 'q0'
+      mem_cache_value: null
+      tape_input: '1'
+    output:
+      final_state: 'q0'
+      mem_cache_value: null
+      tape_output: '1'
+      tape_displacement: 'R'
+
+  - params:
+      initial_state: 'q_firstSum_IdentifyFirst'
+      mem_cache_value: null
+      tape_input: '1'
+    output:
+      final_state: 'q_firstSum_SearchSecond'
+      mem_cache_value: '1'
+      tape_output: 'B'
+      tape_displacement: 'R'
+
+  - params:
+      initial_state: 'q_firstSum_IdentifyFirst'
+      mem_cache_value: null
+      tape_input: '0'
+    output:
+      final_state: 'q_firstSum_SearchSecond'
+      mem_cache_value: '0'
+      tape_output: 'B'
+      tape_displacement: 'R'
+
+## Se mueve a la derecha hasta encontrar un _
+  - params:
+      initial_state: 'q_firstSum_SearchSecond'
+      mem_cache_value: '1'
+      tape_input: '#'
+    output:
+      final_state: 'q_firstSum_SearchSecond'
+      mem_cache_value: '1'
+      tape_output: '#'
+      tape_displacement: 'R'
+  - params:
+      initial_state: 'q_firstSum_SearchSecond'
+      mem_cache_value: '0'
+      tape_input: '#'
+    output:
+      final_state: 'q_firstSum_SearchSecond'
+      mem_cache_value: '0'
+      tape_output: '#'
+      tape_displacement: 'R'
+
+  - params:
+      initial_state: 'q_firstSum_SearchSecond'
+      mem_cache_value: '1'
+      tape_input: '0'
+    output:
+      final_state: 'q_firstSum_SearchSecond'
+      mem_cache_value: '1'
+      tape_output: '0'
+      tape_displacement: 'R'
+  - params:
+      initial_state: 'q_firstSum_SearchSecond'
+      mem_cache_value: '0'
+      tape_input: '0'
+    output:
+      final_state: 'q_firstSum_SearchSecond'
+      mem_cache_value: '0'
+      tape_output: '0'
+      tape_displacement: 'R'
+      
+  - params:
+      initial_state: 'q_firstSum_SearchSecond'
+      mem_cache_value: '1'
+      tape_input: '1'
+    output:
+      final_state: 'q_firstSum_SearchSecond'
+      mem_cache_value: '1'
+      tape_output: '1'
+      tape_displacement: 'R'
+  - params:
+      initial_state: 'q_firstSum_SearchSecond'
+      mem_cache_value: '0'
+      tape_input: '1'
+    output:
+      final_state: 'q_firstSum_SearchSecond'
+      mem_cache_value: '0'
+      tape_output: '1'
+      tape_displacement: 'R'
+
+  - params:
+      initial_state: 'q_firstSum_SearchSecond'
+      mem_cache_value: '1'
+      tape_input: '_'
+    output:
+      final_state: 'q_firstSum_IdentifySecond'
+      mem_cache_value: '1'
+      tape_output: '_'
+      tape_displacement: 'L'
+  - params:
+      initial_state: 'q_firstSum_SearchSecond'
+      mem_cache_value: '0'
+      tape_input: '_'
+    output:
+      final_state: 'q_firstSum_IdentifySecond'
+      mem_cache_value: '0'
+      tape_output: '_'
+      tape_displacement: 'L'
+
+## Identifica y Suma con la memoria
+  - params:
+      initial_state: 'q_firstSum_IdentifySecond'
+      mem_cache_value: '0'
+      tape_input: '1'
+    output:
+      final_state: 'q_normalSum_SearchFirst'
+      mem_cache_value: '0'
+      tape_output: 'O'
+      tape_displacement: 'L'
+  - params:
+      initial_state: 'q_firstSum_IdentifySecond'
+      mem_cache_value: '1'
+      tape_input: '1'
+    output:
+      final_state: 'q_normalSum_SearchFirst'
+      mem_cache_value: '1'
+      tape_output: 'Z'
+      tape_displacement: 'L'
+
+  - params:
+      initial_state: 'q_firstSum_IdentifySecond'
+      mem_cache_value: '0'
+      tape_input: '0'
+    output:
+      final_state: 'q_normalSum_SearchFirst'
+      mem_cache_value: '0'
+      tape_output: 'Z'
+      tape_displacement: 'L'
+  - params:
+      initial_state: 'q_firstSum_IdentifySecond'
+      mem_cache_value: '1'
+      tape_input: '0'
+    output:
+      final_state: 'q_normalSum_SearchFirst'
+      mem_cache_value: '0'
+      tape_output: 'O'
+      tape_displacement: 'L'
+
+## Empezar la suma normal
+## Busca el último dígito del primer número
+
+  - params:
+      initial_state: 'q_normalSum_SearchFirst'
+      mem_cache_value: '0'
+      tape_input: '0'
+    output:
+      final_state: 'q_normalSum_SearchFirst'
+      mem_cache_value: '0'
+      tape_output: '0'
+      tape_displacement: 'L'
+  - params:
+      initial_state: 'q_normalSum_SearchFirst'
+      mem_cache_value: '1'
+      tape_input: '0'
+    output:
+      final_state: 'q_normalSum_SearchFirst'
+      mem_cache_value: '1'
+      tape_output: '0'
+      tape_displacement: 'L'
+
+  - params:
+      initial_state: 'q_normalSum_SearchFirst'
+      mem_cache_value: '0'
+      tape_input: '1'
+    output:
+      final_state: 'q_normalSum_SearchFirst'
+      mem_cache_value: '0'
+      tape_output: '1'
+      tape_displacement: 'L'
+  - params:
+      initial_state: 'q_normalSum_SearchFirst'
+      mem_cache_value: '1'
+      tape_input: '1'
+    output:
+      final_state: 'q_normalSum_SearchFirst'
+      mem_cache_value: '1'
+      tape_output: '1'
+      tape_displacement: 'L'
+# Cuando se encuentra eun #, se pasa a un estado que verifica si hay más dígitos en el primer número
+  - params:
+      initial_state: 'q_normalSum_SearchFirst'
+      mem_cache_value: '0'
+      tape_input: '#'
+    output:
+      final_state: 'q_normalSum_IdentifyFirst'
+      mem_cache_value: '0'
+      tape_output: '#'
+      tape_displacement: 'L'
+  - params:
+      initial_state: 'q_normalSum_SearchFirst'
+      mem_cache_value: '1'
+      tape_input: '#'
+    output:
+      final_state: 'q_normalSum_IdentifyFirst'
+      mem_cache_value: '1'
+      tape_output: '#'
+      tape_displacement: 'L'
+
+
+##Buscar 0 o 1, ignorar B, si se encuentra un _ se pasa a un estado de aceptación
+  - params:
+      initial_state: 'q_normalSum_IdentifyFirst'
+      mem_cache_value: '0'
+      tape_input: 'B'
+    output:
+      final_state: 'q_normalSum_IdentifyFirst'
+      mem_cache_value: '0'
+      tape_output: 'B'
+      tape_displacement: 'L'
+  - params:
+      initial_state: 'q_normalSum_IdentifyFirst'
+      mem_cache_value: '1'
+      tape_input: 'B'
+    output:
+      final_state: 'q_normalSum_IdentifyFirst'
+      mem_cache_value: '1'
+      tape_output: 'B'
+      tape_displacement: 'L'
+
+  - params:
+      initial_state: 'q_normalSum_IdentifyFirst'
+      mem_cache_value: '0'
+      tape_input: '0'
+    output:
+      final_state: 'q_normalSum_SearchSecond'
+      mem_cache_value: '0'
+      tape_output: 'B'
+      tape_displacement: 'R'
+  - params:
+      initial_state: 'q_normalSum_IdentifyFirst'
+      mem_cache_value: '1'
+      tape_input: '0'
+    output:
+      final_state: 'q_normalSum_SearchSecond'
+      mem_cache_value: '1'
+      tape_output: 'B'
+      tape_displacement: 'R'
+
+  - params:
+      initial_state: 'q_normalSum_IdentifyFirst'
+      mem_cache_value: '0'
+      tape_input: '1'
+    output:
+      final_state: 'q_normalSum_SearchSecond'
+      mem_cache_value: '1'
+      tape_output: 'B'
+      tape_displacement: 'R'
+  - params:
+      initial_state: 'q_normalSum_IdentifyFirst'
+      mem_cache_value: '1'
+      tape_input: '1'
+    output:
+      final_state: 'q_normalSum_SearchSecond'
+      mem_cache_value: '10'
+      tape_output: 'B'
+      tape_displacement: 'R'
+
+## Para cuando termina de sumar todos los dígitos del primer número no encontrará otro dígito antes de una B, solo encontrará un _
+  - params:
+      initial_state: 'q_normalSum_IdentifyFirst'
+      mem_cache_value: '0'
+      tape_input: '_'
+    output:
+      final_state: 'q_Verify_SearchSecond'
+      mem_cache_value: '0'
+      tape_output: '_'
+      tape_displacement: 'R'
+  - params:
+      initial_state: 'q_normalSum_IdentifyFirst'
+      mem_cache_value: '1'
+      tape_input: '_'
+    output:
+      final_state: 'q_Verify_SearchSecond'
+      mem_cache_value: '1'
+      tape_output: '_'
+      tape_displacement: 'R'
+  - params:
+      initial_state: 'q_normalSum_IdentifyFirst'
+      mem_cache_value: '10'
+      tape_input: '_'
+    output:
+      final_state: 'q_Verify_SearchSecond'
+      mem_cache_value: '10'
+      tape_output: '_'
+      tape_displacement: 'R'
+
+
+## Moverse al segundo número y buscar el último dígito del segundo número (Se busca un Z o O)
+  - params:
+      initial_state: 'q_normalSum_SearchSecond'
+      mem_cache_value: '0'
+      tape_input: 'B'
+    output:
+      final_state: 'q_normalSum_SearchSecond'
+      mem_cache_value: '0'
+      tape_output: 'B'
+      tape_displacement: 'R'
+  - params:
+      initial_state: 'q_normalSum_SearchSecond'
+      mem_cache_value: '1'
+      tape_input: 'B'
+    output:
+      final_state: 'q_normalSum_SearchSecond'
+      mem_cache_value: '1'
+      tape_output: 'B'
+      tape_displacement: 'R'
+  - params:
+      initial_state: 'q_normalSum_SearchSecond'
+      mem_cache_value: '10'
+      tape_input: 'B'
+    output:
+      final_state: 'q_normalSum_SearchSecond'
+      mem_cache_value: '10'
+      tape_output: 'B'
+      tape_displacement: 'R'
+
+  - params:
+      initial_state: 'q_normalSum_SearchSecond'
+      mem_cache_value: '0'
+      tape_input: '#'
+    output:
+      final_state: 'q_normalSum_SearchSecond'
+      mem_cache_value: '0'
+      tape_output: '#'
+      tape_displacement: 'R'
+  - params:
+      initial_state: 'q_normalSum_SearchSecond'
+      mem_cache_value: '1'
+      tape_input: '#'
+    output:
+      final_state: 'q_normalSum_SearchSecond'
+      mem_cache_value: '1'
+      tape_output: '#'
+      tape_displacement: 'R'
+  - params:
+      initial_state: 'q_normalSum_SearchSecond'
+      mem_cache_value: '10'
+      tape_input: '#'
+    output:
+      final_state: 'q_normalSum_SearchSecond'
+      mem_cache_value: '10'
+      tape_output: '#'
+      tape_displacement: 'R'
+
+  - params:
+      initial_state: 'q_normalSum_SearchSecond'
+      mem_cache_value: '0'
+      tape_input: '0'
+    output:
+      final_state: 'q_normalSum_SearchSecond'
+      mem_cache_value: '0'
+      tape_output: '0'
+      tape_displacement: 'R'
+  - params:
+      initial_state: 'q_normalSum_SearchSecond'
+      mem_cache_value: '1'
+      tape_input: '0'
+    output:
+      final_state: 'q_normalSum_SearchSecond'
+      mem_cache_value: '1'
+      tape_output: '0'
+      tape_displacement: 'R'
+  - params:
+      initial_state: 'q_normalSum_SearchSecond'
+      mem_cache_value: '10'
+      tape_input: '0'
+    output:
+      final_state: 'q_normalSum_SearchSecond'
+      mem_cache_value: '10'
+      tape_output: '0'
+      tape_displacement: 'R'
+
+  - params:
+      initial_state: 'q_normalSum_SearchSecond'
+      mem_cache_value: '0'
+      tape_input: '1'
+    output:
+      final_state: 'q_normalSum_SearchSecond'
+      mem_cache_value: '0'
+      tape_output: '1'
+      tape_displacement: 'R'
+  - params:
+      initial_state: 'q_normalSum_SearchSecond'
+      mem_cache_value: '1'
+      tape_input: '1'
+    output:
+      final_state: 'q_normalSum_SearchSecond'
+      mem_cache_value: '1'
+      tape_output: '1'
+      tape_displacement: 'R'
+  - params:
+      initial_state: 'q_normalSum_SearchSecond'
+      mem_cache_value: '10'
+      tape_input: '1'
+    output:
+      final_state: 'q_normalSum_SearchSecond'
+      mem_cache_value: '10'
+      tape_output: '1'
+      tape_displacement: 'R'
+
+  - params:
+      initial_state: 'q_normalSum_SearchSecond'
+      mem_cache_value: '0'
+      tape_input: 'Z'
+    output:
+      final_state: 'q_normalSum_IdentifySecond'
+      mem_cache_value: '0'
+      tape_output: 'Z'
+      tape_displacement: 'L'
+  - params:
+      initial_state: 'q_normalSum_SearchSecond'
+      mem_cache_value: '1'
+      tape_input: 'Z'
+    output:
+      final_state: 'q_normalSum_IdentifySecond'
+      mem_cache_value: '1'
+      tape_output: 'Z'
+      tape_displacement: 'L'
+  - params:
+      initial_state: 'q_normalSum_SearchSecond'
+      mem_cache_value: '10'
+      tape_input: 'Z'
+    output:
+      final_state: 'q_normalSum_IdentifySecond'
+      mem_cache_value: '10'
+      tape_output: 'Z'
+      tape_displacement: 'L'
+
+  - params:
+      initial_state: 'q_normalSum_SearchSecond'
+      mem_cache_value: '0'
+      tape_input: 'O'
+    output:
+      final_state: 'q_normalSum_IdentifySecond'
+      mem_cache_value: '0'
+      tape_output: 'O'
+      tape_displacement: 'L'
+  - params:
+      initial_state: 'q_normalSum_SearchSecond'
+      mem_cache_value: '1'
+      tape_input: 'O'
+    output:
+      final_state: 'q_normalSum_IdentifySecond'
+      mem_cache_value: '1'
+      tape_output: 'O'
+      tape_displacement: 'L'
+  - params:
+      initial_state: 'q_normalSum_SearchSecond'
+      mem_cache_value: '10'
+      tape_input: 'O'
+    output:
+      final_state: 'q_normalSum_IdentifySecond'
+      mem_cache_value: '10'
+      tape_output: 'O'
+      tape_displacement: 'L'
+
+## Si ya no quedan dígitos en este segundo nombre, se encontrará únicamente un # o B, por lo que lo reemplazará el número que tenga en el caché
+  - params:
+      initial_state: 'q_Verify_SearchSecond'
+      mem_cache_value: '0'
+      tape_input: '#'
+    output:
+      final_state: 'q_verifyFirst'
+      mem_cache_value: '0'
+      tape_output: 'Z'
+      tape_displacement: 'L'
+  - params:
+      initial_state: 'q_Verify_SearchSecond'
+      mem_cache_value: '1'
+      tape_input: '#'
+    output:
+      final_state: 'q_verifyFirst'
+      mem_cache_value: '0'
+      tape_output: 'Z'
+      tape_displacement: 'L'
+  - params:
+      initial_state: 'q_Verify_SearchSecond'
+      mem_cache_value: '10'
+      tape_input: '#'
+    output:
+      final_state: 'q_verifyFirst'
+      mem_cache_value: '0'
+      tape_output: 'OZ'
+      tape_displacement: 'L'
+
+  - params:
+      initial_state: 'q_Verify_SearchSecond'
+      mem_cache_value: '0'
+      tape_input: 'B'
+    output:
+      final_state: 'q_verifyFirst'
+      mem_cache_value: '0'
+      tape_output: 'Z'
+      tape_displacement: 'L'
+  - params:
+      initial_state: 'q_Verify_SearchSecond'
+      mem_cache_value: '1'
+      tape_input: 'B'
+    output:
+      final_state: 'q_verifyFirst'
+      mem_cache_value: '0'
+      tape_output: 'O'
+      tape_displacement: 'L'
+  - params:
+      initial_state: 'q_Verify_SearchSecond'
+      mem_cache_value: '10'
+      tape_input: 'B'
+    output:
+      final_state: 'q_verifyFirst'
+      mem_cache_value: '0'
+      tape_output: 'OZ'
+      tape_displacement: 'L'
+
+## Identifica y Suma con la memoria
+  - params:
+      initial_state: 'q_normalSum_IdentifySecond'
+      mem_cache_value: '0'
+      tape_input: '0'
+    output:
+      final_state: 'q_normalSum_SearchFirst'
+      mem_cache_value: '0'
+      tape_output: 'Z'
+      tape_displacement: 'L'
+  - params:
+      initial_state: 'q_normalSum_IdentifySecond'
+      mem_cache_value: '1'
+      tape_input: '0'
+    output:
+      final_state: 'q_normalSum_SearchFirst'
+      mem_cache_value: '0'
+      tape_output: 'O'
+      tape_displacement: 'L'
+  - params:
+      initial_state: 'q_normalSum_IdentifySecond'
+      mem_cache_value: '10'
+      tape_input: '0'
+    output:
+      final_state: 'q_normalSum_SearchFirst'
+      mem_cache_value: '1'
+      tape_output: 'Z'
+      tape_displacement: 'L'
+
+  - params:
+      initial_state: 'q_normalSum_IdentifySecond'
+      mem_cache_value: '0'
+      tape_input: '1'
+    output:
+      final_state: 'q_normalSum_SearchFirst'
+      mem_cache_value: '0'
+      tape_output: 'O'
+      tape_displacement: 'L'
+  - params:
+      initial_state: 'q_normalSum_IdentifySecond'
+      mem_cache_value: '1'
+      tape_input: '1'
+    output:
+      final_state: 'q_normalSum_SearchFirst'
+      mem_cache_value: '1'
+      tape_output: 'Z'
+      tape_displacement: 'L'
+  - params:
+      initial_state: 'q_normalSum_IdentifySecond'
+      mem_cache_value: '10'
+      tape_input: '1'
+    output:
+      final_state: 'q_normalSum_SearchFirst'
+      mem_cache_value: '1'
+      tape_output: 'O'
+      tape_displacement: 'L'
+
+
+## Después de que el estado de q_normalSum_SearchSecond encuentre un # o B, buscar el siguiente dígito a la izquierda ignorando el resto de B's y entonces guardarlo en el estado y pasar al estado SearchSecond. De únicamente encontrar un _, significa que ahora si ya no hay dígitos por sumar y se pasa al estado de aceptación
+  - params:
+      initial_state: 'q_verifyFirst'
+      mem_cache_value: '0'
+      tape_input: 'B'
+    output:
+      final_state: 'q_verifyFirst'
+      mem_cache_value: '0'
+      tape_output: 'B'
+      tape_displacement: 'L'
+  - params:
+      initial_state: 'q_verifyFirst'
+      mem_cache_value: '1'
+      tape_input: 'B'
+    output:
+      final_state: 'q_verifyFirst'
+      mem_cache_value: '1'
+      tape_output: 'B'
+      tape_displacement: 'L'
+  - params:
+      initial_state: 'q_verifyFirst'
+      mem_cache_value: '10'
+      tape_input: 'B'
+    output:
+      final_state: 'q_verifyFirst'
+      mem_cache_value: '10'
+      tape_output: 'B'
+      tape_displacement: 'L'
+
+  - params:
+      initial_state: 'q_verifyFirst'
+      mem_cache_value: '0'
+      tape_input: '0'
+    output:
+      final_state: 'q_normalSum_SearchSecond'
+      mem_cache_value: '0'
+      tape_output: 'B'
+      tape_displacement: 'R'
+  - params:
+      initial_state: 'q_verifyFirst'
+      mem_cache_value: '1'
+      tape_input: '0'
+    output:
+      final_state: 'q_normalSum_SearchSecond'
+      mem_cache_value: '1'
+      tape_output: 'B'
+      tape_displacement: 'r'
+  - params:
+      initial_state: 'q_verifyFirst'
+      mem_cache_value: '10'
+      tape_input: '0'
+    output:
+      final_state: 'q_normalSum_SearchSecond'
+      mem_cache_value: '10'
+      tape_output: 'B'
+      tape_displacement: 'R'
+
+  - params:
+      initial_state: 'q_verifyFirst'
+      mem_cache_value: '0'
+      tape_input: '1'
+    output:
+      final_state: 'q_normalSum_SearchSecond'
+      mem_cache_value: '1'
+      tape_output: 'B'
+      tape_displacement: 'R'
+  - params:
+      initial_state: 'q_verifyFirst'
+      mem_cache_value: '1'
+      tape_input: '1'
+    output:
+      final_state: 'q_normalSum_SearchSecond'
+      mem_cache_value: '10'
+      tape_output: 'B'
+      tape_displacement: 'R'
+  - params:
+      initial_state: 'q_verifyFirst'
+      mem_cache_value: '10'
+      tape_input: '1'
+    output:
+      final_state: 'q_normalSum_SearchSecond'
+      mem_cache_value: '11'
+      tape_output: 'B'
+      tape_displacement: 'L'
+      
+
+simulation_strings:
+  - '011#001'
+  - '0001#0001'
+  - '0111#0001'
+  - '1100#0011'
