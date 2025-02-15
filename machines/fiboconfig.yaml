@@ -1,0 +1,812 @@
+q_states:
+  q_list:
+  # fase 1
+    - 'q0'       # Estado inicial
+    - 'q1'       # Busca otro 1 o un Blank para el caso base
+    - 'qis1'     # Devuelve f(1) = 1
+    - 'qcount'   # como n >= 2, Convierte los 1 en X
+    - 'qmove'    # Se mueve al final de la cinta
+    - 'qsetup1'  # Escribe #
+    - 'qsetup2'  # Escribe 0
+    - 'qsetup3'  # Escribe #
+    - 'qsetup4'  # Escribe 1
+# Estados para la suma
+    - 'qreset'   # Va al Blank al inicio de la cinta
+    - 'qverifyX' # Elimina una X para sumar mem=2, si encuentra # termina la suma
+  # fase 2:  Copiar f(n-2) despues de f(n-1)
+    - 'qgo_num1R'  # Se busca '#' (inicio de num1)
+    - 'qcopy_num1'  # Borrar 1, si encuentra '#' lo borra y pasamos a la siguiente parte mem=3
+    - 'qpaste_num1' # Ir a la derecha de la cinta, si encuentra _ escribe B
+    - 'qgo_num1L'  # Se busca '#' (final de num1) hace L pasa a qcopy_num1
+    - 'qgo_num1LStart'  # Se busca el primer '#' de num1 hace R pasa a qcopy_num1
+  # fase 3: Copiar suma al lado derecho
+    - 'qgo_end'   # Busca Blank del final para escribir '#'
+    - 'q_pass_hash' # Busca # a la izquierda y L
+    - 'q_copy1s'  # Buscar 1, lo lee , escribe A y pasa a estado paste Bs, si encuentra #, fase4
+    - 'q_pasteBs' # Busca Blank a la derecha y escribe B  pasa a q_pass_hash2
+    - 'q_pass_hash2' # Busca '#' a la izquierda y L (q_copy1s) 
+  # fase 4: Eliminar B de izquierda y pegarlas a la derecha
+    - 'qgo_end2' # Escribe # al final de la cinta y L
+    - 'q_pass_hash3' # Busca '#' a la izquierda y L (q_delBs) 
+    - 'q_delBs'   # Lee B y Right       - Pasa a paste Bs   Si lee '#' -> Fase 5
+    - 'q_pasteBs' # Busca _ a la derecha y escribe B y L
+  # fase 5: Reemplaza As y Bs por 1s
+    - 'q_place1sA' # Skip '#', R: 'B', 'A'  W: '1' - Va a qreset
+    - 'q_place1sAreturn' # Skip '#', R: 'B', 'A'  W: '1' - Va a qreset
+    - 'q_place1sB' # Skip '#', R: 'B', 'A'  W: '1' - Va a qreset
+  # fase 6: finaliza suma
+    - 'qaccept' 
+  initial: 'q0'
+  final:
+    - 'qaccept'
+
+alphabet:
+  - '1'
+  - '#'
+
+tape_alphabet:
+  - '1'
+  - 'X'
+  - '_'
+  - '#'
+  - '0'
+  - 'E'
+
+delta:
+
+  # Si la entrada es vacía (n = 0), la máquina se detiene inmediatamente
+  - params:
+      initial_state: 'q0'
+      mem_cache_value: null
+      tape_input: '_'
+    output:
+      final_state: 'qaccept'
+      mem_cache_value: null
+      tape_output: '_'
+      tape_displacement: 'S'
+
+  # Convierte los 1 en X (Primer 1)
+  - params:
+      initial_state: 'q0'
+      mem_cache_value: null
+      tape_input: '1'
+    output:
+      final_state: 'q1'
+      mem_cache_value: null
+      tape_output: 'X'
+      tape_displacement: 'R'
+
+  # Busca siguiente 1 o Blank (Para f(1) = 1)
+  - params:
+      initial_state: 'q1'
+      mem_cache_value: null
+      tape_input: '_'
+    output:
+      final_state: 'qis1'
+      mem_cache_value: null
+      tape_output: ''
+      tape_displacement: 'L'
+
+  - params:
+      initial_state: 'q1'
+      mem_cache_value: null
+      tape_input: '1'
+    output:
+      final_state: 'qcount'
+      mem_cache_value: null
+      tape_output: 'X'
+      tape_displacement: 'R'
+  
+  # Respuesta para f(1) = 1
+  - params:
+      initial_state: 'qis1'
+      mem_cache_value: null
+      tape_input: 'X'
+    output:
+      final_state: 'qaccept'
+      mem_cache_value: null
+      tape_output: '1'
+      tape_displacement: 'S'
+
+  # Convierte los siguientes 1 en X
+  - params:
+      initial_state: 'qcount'
+      mem_cache_value: null
+      tape_input: '1'
+    output:
+      final_state: 'qcount'
+      mem_cache_value: null
+      tape_output: 'X'
+      tape_displacement: 'R'
+
+  # Cuando llega al final, se mueve al final de la cinta
+  - params:
+      initial_state: 'qcount'
+      mem_cache_value: null
+      tape_input: '_'
+    output:
+      final_state: 'qmove'
+      mem_cache_value: null
+      tape_output: '_'
+      tape_displacement: 'L'  
+
+  # Se mueve hasta la última X y la resta para empezar el calculo desde f(2)
+  - params:
+      initial_state: 'qmove'
+      mem_cache_value: null
+      tape_input: 'X'
+    output:
+      final_state: 'qsetup1'
+      mem_cache_value: null
+      tape_output: '#'
+      tape_displacement: 'R'  
+  # setup2 ya no existe :v
+  # Escribe `#`
+  - params:
+      initial_state: 'qsetup1'
+      mem_cache_value: null
+      tape_input: '_'
+    output:
+      final_state: 'qsetup3'
+      mem_cache_value: null
+      tape_output: '#'
+      tape_displacement: 'R'
+
+  # Escribe `1`
+  - params:
+      initial_state: 'qsetup3'
+      mem_cache_value: null
+      tape_input: '_'
+    output:
+      final_state: 'qreset'
+      mem_cache_value: null
+      tape_output: '1'
+      tape_displacement: 'L'
+
+  # Ir a la primera X para empezar primera suma (Va hasta la izquierda por un blank)
+
+  - params:
+      initial_state: 'qreset'
+      mem_cache_value: null
+      tape_input: '1'
+    output:
+      final_state: 'qreset'
+      mem_cache_value: null
+      tape_output: '1'
+      tape_displacement: 'L'
+
+  - params:
+      initial_state: 'qreset'
+      mem_cache_value: null
+      tape_input: 'E'
+    output:
+      final_state: 'qreset'
+      mem_cache_value: null
+      tape_output: 'E'
+      tape_displacement: 'L'
+
+  - params:
+      initial_state: 'qreset'
+      mem_cache_value: null
+      tape_input: '#'
+    output:
+      final_state: 'qreset'
+      mem_cache_value: null
+      tape_output: '#'
+      tape_displacement: 'L'
+
+  - params:
+      initial_state: 'qreset'
+      mem_cache_value: null
+      tape_input: 'X'
+    output:
+      final_state: 'qreset'
+      mem_cache_value: null
+      tape_output: 'X'
+      tape_displacement: 'L'
+
+  # Si encuentra un blank se va a la derecha para la suma
+  - params:
+      initial_state: 'qreset'
+      mem_cache_value: null
+      tape_input: '_'
+    output:
+      final_state: 'qverifyX'
+      mem_cache_value: null
+      tape_output: '_'
+      tape_displacement: 'R'
+
+  # Si lee #, ya no quedan sumas por hacer
+  - params:
+      initial_state: 'qverifyX'
+      mem_cache_value: null
+      tape_input: '#'
+    output:
+      final_state: 'qaccept'
+      mem_cache_value: null
+      tape_output: '_'
+      tape_displacement: 'R'
+
+  # Si lee X, la quita y pasa a la suma
+  - params:
+      initial_state: 'qverifyX'
+      mem_cache_value: null
+      tape_input: 'X'
+    output:
+      final_state: 'qgo_num1R'
+      mem_cache_value: null
+      tape_output: '_'
+      tape_displacement: 'R'
+  # Fase 2
+  - params:
+      initial_state: 'qgo_num1R'
+      mem_cache_value: null
+      tape_input: 'X'
+    output:
+      final_state: 'qgo_num1R'
+      mem_cache_value: null
+      tape_output: 'X'
+      tape_displacement: 'R'
+
+  - params:
+      initial_state: 'qgo_num1R'
+      mem_cache_value: null
+      tape_input: '#'
+    output:
+      final_state: 'qcopy_num1'
+      mem_cache_value: null
+      tape_output: '#'
+      tape_displacement: 'R'
+
+  - params:
+      initial_state: 'qcopy_num1'
+      mem_cache_value: null
+      tape_input: 'E'
+    output:
+      final_state: 'qcopy_num1'
+      mem_cache_value: null
+      tape_output: 'E'
+      tape_displacement: 'R'
+
+
+  - params:
+      initial_state: 'qcopy_num1'
+      mem_cache_value: null
+      tape_input: '1'
+    output:
+      final_state: 'qpaste_num1'
+      mem_cache_value: null
+      tape_output: 'E'
+      tape_displacement: 'R'
+
+  - params:
+      initial_state: 'qcopy_num1'
+      mem_cache_value: null
+      tape_input: '#'
+    output:
+      final_state: 'qgo_end'  # go to Fase 3
+      mem_cache_value: null
+      tape_output: 'E'
+      tape_displacement: 'R'
+
+  - params:
+      initial_state: 'qpaste_num1'
+      mem_cache_value: null
+      tape_input: '1'
+    output:
+      final_state: 'qpaste_num1'
+      mem_cache_value: null
+      tape_output: '1'
+      tape_displacement: 'R'
+
+  - params:
+      initial_state: 'qpaste_num1'
+      mem_cache_value: null
+      tape_input: 'E'
+    output:
+      final_state: 'qpaste_num1'
+      mem_cache_value: null
+      tape_output: 'E'
+      tape_displacement: 'R'
+
+  - params:
+      initial_state: 'qpaste_num1'
+      mem_cache_value: null
+      tape_input: '#'
+    output:
+      final_state: 'qpaste_num1'
+      mem_cache_value: null
+      tape_output: '#'
+      tape_displacement: 'R'
+
+  - params:
+      initial_state: 'qpaste_num1'
+      mem_cache_value: null
+      tape_input: 'B'
+    output:
+      final_state: 'qpaste_num1'
+      mem_cache_value: null
+      tape_output: 'B'
+      tape_displacement: 'R'
+
+  - params:
+      initial_state: 'qpaste_num1'
+      mem_cache_value: null
+      tape_input: '_'
+    output:
+      final_state: 'qgo_num1L'
+      mem_cache_value: null
+      tape_output: 'B'
+      tape_displacement: 'L'
+
+  - params:
+      initial_state: 'qgo_num1L'
+      mem_cache_value: null
+      tape_input: 'B'
+    output:
+      final_state: 'qgo_num1L'
+      mem_cache_value: null
+      tape_output: 'B'
+      tape_displacement: 'L'
+
+  - params:
+      initial_state: 'qgo_num1L'
+      mem_cache_value: null
+      tape_input: '1'
+    output:
+      final_state: 'qgo_num1L'
+      mem_cache_value: null
+      tape_output: '1'
+      tape_displacement: 'L'
+
+  - params:
+      initial_state: 'qgo_num1L'
+      mem_cache_value: null
+      tape_input: '#'
+    output:
+      final_state: 'qgo_num1LStart'
+      mem_cache_value: null
+      tape_output: '#'
+      tape_displacement: 'L'
+
+  - params:
+      initial_state: 'qgo_num1LStart'
+      mem_cache_value: null
+      tape_input: '1'
+    output:
+      final_state: 'qgo_num1LStart'
+      mem_cache_value: null
+      tape_output: '1'
+      tape_displacement: 'L'
+
+  - params:
+      initial_state: 'qgo_num1LStart'
+      mem_cache_value: null
+      tape_input: 'E'
+    output:
+      final_state: 'qgo_num1LStart'
+      mem_cache_value: null
+      tape_output: 'E'
+      tape_displacement: 'L'
+
+  - params:
+      initial_state: 'qgo_num1LStart'
+      mem_cache_value: null
+      tape_input: 'B'
+    output:
+      final_state: 'qgo_num1LStart'
+      mem_cache_value: null
+      tape_output: 'B'
+      tape_displacement: 'L'
+
+  - params:
+      initial_state: 'qgo_num1LStart'
+      mem_cache_value: null
+      tape_input: '#'
+    output:
+      final_state: 'qcopy_num1'
+      mem_cache_value: null
+      tape_output: '#'
+      tape_displacement: 'R'
+
+  # Fase 3
+  - params:
+      initial_state: 'qgo_end'
+      mem_cache_value: null
+      tape_input: '1'
+    output:
+      final_state: 'qgo_end'
+      mem_cache_value: null
+      tape_output: '1'
+      tape_displacement: 'R'
+
+  - params:
+      initial_state: 'qgo_end'
+      mem_cache_value: null
+      tape_input: 'B'
+    output:
+      final_state: 'qgo_end'
+      mem_cache_value: null
+      tape_output: 'B'
+      tape_displacement: 'R'
+
+  - params:
+      initial_state: 'qgo_end'
+      mem_cache_value: null
+      tape_input: '#'
+    output:
+      final_state: 'qgo_end'
+      mem_cache_value: null
+      tape_output: '_'
+      tape_displacement: 'R'
+
+  - params:
+      initial_state: 'qgo_end'
+      mem_cache_value: null
+      tape_input: '_'
+    output:
+      final_state: 'q_pass_hash'
+      mem_cache_value: null
+      tape_output: '#'
+      tape_displacement: 'L'
+
+  - params:
+      initial_state: 'q_pass_hash'
+      mem_cache_value: null
+      tape_input: 'B'
+    output:
+      final_state: 'q_pass_hash'
+      mem_cache_value: null
+      tape_output: 'B'
+      tape_displacement: 'L'
+
+  - params:
+      initial_state: 'q_pass_hash'
+      mem_cache_value: null
+      tape_input: 'A'
+    output:
+      final_state: 'q_pass_hash'
+      mem_cache_value: null
+      tape_output: 'A'
+      tape_displacement: 'L'
+
+  - params:
+      initial_state: 'q_pass_hash'
+      mem_cache_value: null
+      tape_input: '1'
+    output:
+      final_state: 'q_pass_hash'
+      mem_cache_value: null
+      tape_output: '1'
+      tape_displacement: 'L'
+
+
+  - params:
+      initial_state: 'q_pass_hash'
+      mem_cache_value: null
+      tape_input: 'E'
+    output:
+      final_state: 'q_pass_hash'
+      mem_cache_value: null
+      tape_output: 'E'
+      tape_displacement: 'L'
+
+  - params:
+      initial_state: 'q_pass_hash'
+      mem_cache_value: null
+      tape_input: '#'
+    output:
+      final_state: 'q_copy1s'
+      mem_cache_value: null
+      tape_output: '#'
+      tape_displacement: 'R'
+
+
+  - params:
+      initial_state: 'q_copy1s'
+      mem_cache_value: null
+      tape_input: 'A'
+    output:
+      final_state: 'q_copy1s'
+      mem_cache_value: null
+      tape_output: 'A'
+      tape_displacement: 'R'
+      
+  - params:
+      initial_state: 'q_copy1s'
+      mem_cache_value: null
+      tape_input: 'E'
+    output:
+      final_state: 'q_copy1s'
+      mem_cache_value: null
+      tape_output: 'E'
+      tape_displacement: 'R'
+  
+  - params:
+      initial_state: 'q_copy1s'
+      mem_cache_value: null
+      tape_input: 'B'
+    output:
+      final_state: 'q_copy1s'
+      mem_cache_value: null
+      tape_output: 'B'
+      tape_displacement: 'R'
+
+  - params:
+      initial_state: 'q_copy1s'
+      mem_cache_value: null
+      tape_input: '1'
+    output:
+      final_state: 'q_pasteBs'
+      mem_cache_value: null
+      tape_output: 'A'
+      tape_displacement: 'R'
+
+  - params:
+      initial_state: 'q_copy1s'
+      mem_cache_value: null
+      tape_input: '#'
+    output:
+      final_state: 'qgo_end2' # Fase 4
+      mem_cache_value: null
+      tape_output: '#'
+      tape_displacement: 'R'
+
+  - params:
+      initial_state: 'q_pasteBs'
+      mem_cache_value: null
+      tape_input: '#'
+    output:
+      final_state: 'q_pasteBs'
+      mem_cache_value: null
+      tape_output: '#'
+      tape_displacement: 'R'
+  - params:
+      initial_state: 'q_pasteBs'
+      mem_cache_value: null
+      tape_input: '1'
+    output:
+      final_state: 'q_pasteBs'
+      mem_cache_value: null
+      tape_output: '1'
+      tape_displacement: 'R'
+  - params:
+      initial_state: 'q_pasteBs'
+      mem_cache_value: null
+      tape_input: 'E'
+    output:
+      final_state: 'q_pasteBs'
+      mem_cache_value: null
+      tape_output: 'E'
+      tape_displacement: 'R'
+  - params:
+      initial_state: 'q_pasteBs'
+      mem_cache_value: null
+      tape_input: 'B'
+    output:
+      final_state: 'q_pasteBs'
+      mem_cache_value: null
+      tape_output: 'B'
+      tape_displacement: 'R'
+
+  - params:
+      initial_state: 'q_pasteBs'
+      mem_cache_value: null
+      tape_input: '_'
+    output:
+      final_state: 'q_pass_hash2'
+      mem_cache_value: null
+      tape_output: 'B'
+      tape_displacement: 'L'
+
+#
+  - params:
+      initial_state: 'q_pass_hash2'
+      mem_cache_value: null
+      tape_input: 'B'
+    output:
+      final_state: 'q_pass_hash2'
+      mem_cache_value: null
+      tape_output: 'B'
+      tape_displacement: 'L'
+  - params:
+      initial_state: 'q_pass_hash2'
+      mem_cache_value: null
+      tape_input: '1'
+    output:
+      final_state: 'q_pass_hash2'
+      mem_cache_value: null
+      tape_output: '1'
+      tape_displacement: 'L'
+  - params:
+      initial_state: 'q_pass_hash2'
+      mem_cache_value: null
+      tape_input: '#'
+    output:
+      final_state: 'q_pass_hash'
+      mem_cache_value: null
+      tape_output: '#'
+      tape_displacement: 'L'
+# Fase 4
+  - params:
+      initial_state: 'qgo_end2'
+      mem_cache_value: null
+      tape_input: '1'
+    output:
+      final_state: 'qgo_end2'
+      mem_cache_value: null
+      tape_output: '1'
+      tape_displacement: 'R'
+
+  - params:
+      initial_state: 'qgo_end2'
+      mem_cache_value: null
+      tape_input: 'B'
+    output:
+      final_state: 'qgo_end2'
+      mem_cache_value: null
+      tape_output: 'B'
+      tape_displacement: 'R'
+
+  - params:
+      initial_state: 'qgo_end2'
+      mem_cache_value: null
+      tape_input: '_'
+    output:
+      final_state: 'q_pass_hash3'
+      mem_cache_value: null
+      tape_output: '_'
+      tape_displacement: 'L'
+
+  - params:
+      initial_state: 'q_pass_hash3'
+      mem_cache_value: null
+      tape_input: '1'
+    output:
+      final_state: 'q_pass_hash3'
+      mem_cache_value: null
+      tape_output: '1'
+      tape_displacement: 'L'
+
+  - params:
+      initial_state: 'q_pass_hash3'
+      mem_cache_value: null
+      tape_input: 'B'
+    output:
+      final_state: 'q_pass_hash3'
+      mem_cache_value: null
+      tape_output: 'B'
+      tape_displacement: 'L'
+
+  - params:
+      initial_state: 'q_pass_hash3'
+      mem_cache_value: null
+      tape_input: '#'
+    output:
+      final_state: 'q_delBs'
+      mem_cache_value: null
+      tape_output: '#'
+      tape_displacement: 'L'
+
+  - params:
+      initial_state: 'q_delBs'
+      mem_cache_value: null
+      tape_input: 'E'
+    output:
+      final_state: 'q_delBs'
+      mem_cache_value: null
+      tape_output: 'E'
+      tape_displacement: 'L'
+
+  - params:
+      initial_state: 'q_delBs'
+      mem_cache_value: null
+      tape_input: 'B'
+    output:
+      final_state: 'q_pasteBs'
+      mem_cache_value: null
+      tape_output: 'E'
+      tape_displacement: 'R'
+
+  - params:
+      initial_state: 'q_delBs'
+      mem_cache_value: null
+      tape_input: 'A'
+    output:
+      final_state: 'q_place1sA'
+      mem_cache_value: null
+      tape_output: 'A'
+      tape_displacement: 'S'
+
+  - params:
+      initial_state: 'q_place1sA'
+      mem_cache_value: null
+      tape_input: 'A'
+    output:
+      final_state: 'q_place1sA'
+      mem_cache_value: null
+      tape_output: '1'
+      tape_displacement: 'L'
+  - params:
+      initial_state: 'q_place1sA'
+      mem_cache_value: null
+      tape_input: 'E'
+    output:
+      final_state: 'q_place1sA'
+      mem_cache_value: null
+      tape_output: 'E'
+      tape_displacement: 'L'
+
+  - params:
+      initial_state: 'q_place1sA'
+      mem_cache_value: null
+      tape_input: '#'
+    output:
+      final_state: 'q_place1sAreturn'
+      mem_cache_value: null
+      tape_output: '#'
+      tape_displacement: 'R'
+
+  - params:
+      initial_state: 'q_place1sAreturn'
+      mem_cache_value: null
+      tape_input: 'E'
+    output:
+      final_state: 'q_place1sAreturn'
+      mem_cache_value: null
+      tape_output: 'E'
+      tape_displacement: 'R'
+
+  - params:
+      initial_state: 'q_place1sAreturn'
+      mem_cache_value: null
+      tape_input: '1'
+    output:
+      final_state: 'q_place1sAreturn'
+      mem_cache_value: null
+      tape_output: '1'
+      tape_displacement: 'R'
+
+  - params:
+      initial_state: 'q_place1sAreturn'
+      mem_cache_value: null
+      tape_input: '#'
+    output:
+      final_state: 'q_place1sB'
+      mem_cache_value: null
+      tape_output: '#'
+      tape_displacement: 'R'
+
+  - params:
+      initial_state: 'q_place1sB'
+      mem_cache_value: null
+      tape_input: 'B'
+    output:
+      final_state: 'q_place1sB'
+      mem_cache_value: null
+      tape_output: '1'
+      tape_displacement: 'R'
+
+  - params:
+      initial_state: 'q_place1sB'
+      mem_cache_value: null
+      tape_input: '_'
+    output:
+      final_state: 'qreset'
+      mem_cache_value: null
+      tape_output: '_'
+      tape_displacement: 'L'
+
+simulation_strings:
+  - '1'
+  - '11'
+  - '111'
+  - '1111'
+  - '11111'
+  - '111111'
+  - '1111111'
+  - '11111111'
+  - '111111111'
+  - '1111111111'
+  - '11111111111'
+  - '111111111111'

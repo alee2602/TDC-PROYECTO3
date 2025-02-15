@@ -1,4 +1,5 @@
 from tape import Tape
+from time import time
 
 class TuringMachine:
     def __init__(self, config):
@@ -31,10 +32,12 @@ class TuringMachine:
         description = f"{left_tape}[{self.current_state}, {cache_value}]{current_symbol}{right_tape}"
         return description
 
+
     def execute(self):
         steps = 0
-        max_steps = 1000
-        
+        max_steps = 10**12  # 1000000000000
+
+        t1_start = time()  # Tiempo real de inicio
         print("\nEjecución de la máquina de Turing:")
         initial_desc = self.generate_instant_description()
         print(f"Descripción inicial:  ⊢ {initial_desc}")
@@ -48,18 +51,22 @@ class TuringMachine:
                 self.current_state = 'qreject'
                 final_desc = self.generate_instant_description()
                 print(f"Descripción final (rechazado): {final_desc}")
-                return False
+                return False, 0, steps
             
             self.apply_transition(transition)
-            
             current_desc = self.generate_instant_description()
             print(f" ⊢ {current_desc}")
             steps += 1
         
         success = self.current_state == 'qaccept'
+        t1_stop = time()
+        ProcessingTime = t1_stop - t1_start
+
+        print(f"Tiempo total en segundos: {ProcessingTime:.6f}")
         final_desc = self.generate_instant_description()
-        #print(f"\nDescripción final ({'aceptado' if success else 'rechazado'}): {final_desc}")
-        return success
+        
+        return success, ProcessingTime, steps
+
 
     def find_transition(self, symbol):
         for transition in self.delta:
